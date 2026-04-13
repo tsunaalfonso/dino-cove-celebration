@@ -27,6 +27,14 @@ const BabyPhotoSection = () => {
   const prev = useCallback(() => setCurrent((c) => (c - 1 + photoUrls.length) % photoUrls.length), [photoUrls.length]);
   const next = useCallback(() => setCurrent((c) => (c + 1) % photoUrls.length), [photoUrls.length]);
 
+  useEffect(() => {
+    if (photoUrls.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrent((c) => (c + 1) % photoUrls.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [photoUrls.length]);
+
   if (!photoUrls.length) return null;
 
   return (
