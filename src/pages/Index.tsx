@@ -2,6 +2,7 @@ import dinoRunning from "@/assets/dino-running.png";
 import FloatingElements from "@/components/FloatingElements";
 import HeroSection from "@/components/HeroSection";
 import EventDetailsSection from "@/components/EventDetailsSection";
+import BabyPhotoSection from "@/components/BabyPhotoSection";
 import MapSection from "@/components/MapSection";
 import RsvpSection from "@/components/RsvpSection";
 import Footer from "@/components/Footer";
@@ -28,6 +29,7 @@ const Index = () => {
       <FloatingElements />
       <HeroSection settings={settings} />
       <EventDetailsSection settings={settings} />
+      <BabyPhotoSection />
       <MapSection settings={settings} />
       <RsvpSection />
       <Footer />

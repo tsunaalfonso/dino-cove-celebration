@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AdminSettingsEditor from "@/components/AdminSettingsEditor";
+import BabyPhotoUpload from "@/components/BabyPhotoUpload";
 
 interface RsvpEntry {
   id: string;
@@ -119,6 +120,11 @@ const Admin = () => {
         {/* Event Settings */}
         <div className="mb-8">
           <AdminSettingsEditor />
+        </div>
+
+        {/* Baby Photo Upload */}
+        <div className="mb-8">
+          <BabyPhotoUpload />
         </div>
 
         {/* Table */}
