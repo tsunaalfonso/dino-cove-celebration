@@ -1,3 +1,4 @@
+import dinoRunning from "@/assets/dino-running.png";
 import FloatingElements from "@/components/FloatingElements";
 import HeroSection from "@/components/HeroSection";
 import EventDetailsSection from "@/components/EventDetailsSection";
