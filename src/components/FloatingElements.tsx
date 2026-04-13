@@ -1,4 +1,5 @@
 import dinoEgg from "@/assets/dino-egg.png";
+import dinoRunning from "@/assets/dino-running.png";
 
 const FloatingElements = () => {
   return (
@@ -34,6 +35,32 @@ const FloatingElements = () => {
         loading="lazy"
         width={56}
         height={56}
+      />
+      {/* Running dinos */}
+      <img
+        src={dinoRunning}
+        alt=""
+        className="absolute bottom-[8%] w-16 h-16 opacity-15 animate-run-dino"
+        loading="lazy"
+        width={64}
+        height={64}
+      />
+      <img
+        src={dinoRunning}
+        alt=""
+        className="absolute bottom-[45%] w-10 h-10 opacity-10 animate-run-dino-slow"
+        loading="lazy"
+        width={40}
+        height={40}
+      />
+      <img
+        src={dinoRunning}
+        alt=""
+        className="absolute top-[75%] w-12 h-12 opacity-10 animate-run-dino-reverse"
+        loading="lazy"
+        width={48}
+        height={48}
+        style={{ transform: "scaleX(-1)" }}
       />
       {/* Decorative circles */}
       <div className="absolute top-[15%] right-[25%] w-32 h-32 rounded-full bg-dino-yellow/10 blur-2xl" />
