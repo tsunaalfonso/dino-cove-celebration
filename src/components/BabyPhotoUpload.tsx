@@ -2,81 +2,90 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 
 const BUCKET = "baby-photos";
-const FILE_NAME = "baby-photo";
 
 const BabyPhotoUpload = () => {
   const [uploading, setUploading] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<{ name: string; url: string }[]>([]);
 
   useEffect(() => {
-    loadExistingPhoto();
+    loadPhotos();
   }, []);
 
-  const loadExistingPhoto = async () => {
-    const { data } = await supabase.storage.from(BUCKET).list("", { limit: 10 });
-    const file = data?.find((f) => f.name.startsWith(FILE_NAME));
-    if (file) {
-      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(file.name);
-      setPhotoUrl(urlData.publicUrl + "?t=" + Date.now());
-    }
+  const loadPhotos = async () => {
+    const { data } = await supabase.storage.from(BUCKET).list("", { limit: 50 });
+    if (!data) return;
+    const items = data
+      .filter((f) => !f.name.startsWith("."))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((f) => {
+        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name);
+        return { name: f.name, url: urlData.publicUrl + "?t=" + Date.now() };
+      });
+    setPhotos(items);
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
+    const files = e.target.files;
+    if (!files?.length) return;
 
     setUploading(true);
-    const ext = file.name.split(".").pop();
-    const fileName = `${FILE_NAME}.${ext}`;
-
-    // Remove old photos first
-    const { data: existing } = await supabase.storage.from(BUCKET).list("");
-    if (existing?.length) {
-      await supabase.storage.from(BUCKET).remove(existing.map((f) => f.name));
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+      const ext = file.name.split(".").pop();
+      const fileName = `baby-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true });
+      if (error) toast.error("Upload failed: " + error.message);
     }
-
-    const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true });
-    if (error) {
-      toast.error("Upload failed: " + error.message);
-    } else {
-      toast.success("Baby photo uploaded! 🦕");
-      const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
-      setPhotoUrl(urlData.publicUrl + "?t=" + Date.now());
-    }
+    toast.success("Photos uploaded! 🦕");
+    await loadPhotos();
     setUploading(false);
+    e.target.value = "";
+  };
+
+  const handleDelete = async (name: string) => {
+    await supabase.storage.from(BUCKET).remove([name]);
+    toast.success("Photo removed");
+    setPhotos((prev) => prev.filter((p) => p.name !== name));
   };
 
   return (
     <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
-      <h2 className="font-heading text-xl text-primary mb-4">📸 Baby Photo</h2>
+      <h2 className="font-heading text-xl text-primary mb-4">📸 Baby Photos</h2>
       <p className="text-sm font-body text-muted-foreground mb-4">
-        Upload a photo to display on the website after the event details section.
+        Upload photos to display in the carousel on the website.
       </p>
 
-      {photoUrl && (
-        <div className="mb-4">
-          <img
-            src={photoUrl}
-            alt="Baby photo preview"
-            className="w-full max-w-xs rounded-2xl border border-border shadow-sm object-cover"
-          />
+      {photos.length > 0 && (
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
+          {photos.map((p) => (
+            <div key={p.name} className="relative group">
+              <img
+                src={p.url}
+                alt="Baby"
+                className="w-full h-24 object-cover rounded-xl border border-border"
+              />
+              <button
+                onClick={() => handleDelete(p.name)}
+                className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
       <label className="inline-block">
         <Button asChild disabled={uploading} className="rounded-full font-heading cursor-pointer">
-          <span>{uploading ? "Uploading..." : photoUrl ? "Change Photo 🦖" : "Upload Photo 🦖"}</span>
+          <span>{uploading ? "Uploading..." : "Add Photos 🦖"}</span>
         </Button>
         <input
           type="file"
           accept="image/*"
+          multiple
           onChange={handleUpload}
           className="hidden"
           disabled={uploading}
