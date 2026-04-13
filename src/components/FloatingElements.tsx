@@ -40,7 +40,7 @@ const FloatingElements = () => {
       <img
         src={dinoRunning}
         alt=""
-        className="absolute bottom-[8%] w-16 h-16 opacity-15 animate-run-dino"
+        className="absolute bottom-[8%] w-20 h-20 opacity-60 animate-run-dino drop-shadow-md"
         loading="lazy"
         width={64}
         height={64}
@@ -48,7 +48,7 @@ const FloatingElements = () => {
       <img
         src={dinoRunning}
         alt=""
-        className="absolute bottom-[45%] w-10 h-10 opacity-10 animate-run-dino-slow"
+        className="absolute bottom-[45%] w-14 h-14 opacity-40 animate-run-dino-slow drop-shadow-sm"
         loading="lazy"
         width={40}
         height={40}
@@ -56,7 +56,7 @@ const FloatingElements = () => {
       <img
         src={dinoRunning}
         alt=""
-        className="absolute top-[75%] w-12 h-12 opacity-10 animate-run-dino-reverse"
+        className="absolute top-[75%] w-16 h-16 opacity-45 animate-run-dino-reverse drop-shadow-sm"
         loading="lazy"
         width={48}
         height={48}
