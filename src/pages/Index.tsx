@@ -28,6 +28,7 @@ const Index = () => {
       <FloatingElements />
       <HeroSection settings={settings} />
       <EventDetailsSection settings={settings} />
+      <BabyPhotoSection />
       <MapSection settings={settings} />
       <RsvpSection />
       <Footer />
