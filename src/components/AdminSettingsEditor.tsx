@@ -1,0 +1,102 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+
+interface SettingField {
+  key: string;
+  label: string;
+  type: "input" | "textarea";
+}
+
+const FIELDS: SettingField[] = [
+  { key: "event_date", label: "Event Date (YYYY-MM-DD)", type: "input" },
+  { key: "event_time", label: "Event Time", type: "input" },
+  { key: "ceremony_venue", label: "Ceremony Venue", type: "input" },
+  { key: "ceremony_address", label: "Ceremony Address", type: "input" },
+  { key: "ceremony_time", label: "Ceremony Time Range", type: "input" },
+  { key: "reception_venue", label: "Reception Venue", type: "input" },
+  { key: "reception_address", label: "Reception Address", type: "input" },
+  { key: "reception_time", label: "Reception Time Range", type: "input" },
+  { key: "map_embed_url", label: "Google Maps Embed URL", type: "textarea" },
+  { key: "map_direct_link", label: "Google Maps Direct Link", type: "input" },
+  { key: "dress_code", label: "Dress Code", type: "input" },
+  { key: "special_note", label: "Special Note", type: "textarea" },
+];
+
+const AdminSettingsEditor = () => {
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("event_settings")
+      .select("key, value")
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {};
+          data.forEach((row: { key: string; value: string }) => {
+            map[row.key] = row.value;
+          });
+          setValues(map);
+        }
+        setLoaded(true);
+      });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const promises = Object.entries(values).map(([key, value]) =>
+        supabase
+          .from("event_settings")
+          .update({ value, updated_at: new Date().toISOString() })
+          .eq("key", key)
+      );
+      await Promise.all(promises);
+      toast.success("Event settings saved! 🦕");
+    } catch {
+      toast.error("Failed to save settings");
+    }
+    setSaving(false);
+  };
+
+  if (!loaded) return <p className="text-muted-foreground font-body text-center py-4">Loading settings...</p>;
+
+  return (
+    <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+      <h2 className="font-heading text-xl text-primary mb-5">⚙️ Event Settings</h2>
+      <div className="grid gap-4 md:grid-cols-2">
+        {FIELDS.map((field) => (
+          <div key={field.key} className={field.type === "textarea" ? "md:col-span-2" : ""}>
+            <label className="block text-sm font-body font-semibold text-foreground mb-1">
+              {field.label}
+            </label>
+            {field.type === "textarea" ? (
+              <Textarea
+                value={values[field.key] || ""}
+                onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
+                className="rounded-xl font-body text-sm"
+                rows={3}
+              />
+            ) : (
+              <Input
+                value={values[field.key] || ""}
+                onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
+                className="rounded-xl font-body"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      <Button onClick={handleSave} disabled={saving} className="mt-5 rounded-full font-heading">
+        {saving ? "Saving..." : "Save Settings 🦖"}
+      </Button>
+    </div>
+  );
+};
+
+export default AdminSettingsEditor;

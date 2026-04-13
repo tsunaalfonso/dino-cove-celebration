@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import AdminSettingsEditor from "@/components/AdminSettingsEditor";
 
 interface RsvpEntry {
   id: string;
@@ -113,6 +114,11 @@ const Admin = () => {
               <div className="font-body text-sm text-muted-foreground mt-1">{stat.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Event Settings */}
+        <div className="mb-8">
+          <AdminSettingsEditor />
         </div>
 
         {/* Table */}
