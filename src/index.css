@@ -96,6 +96,16 @@
   50% { transform: rotate(3deg); }
 }
 
+@keyframes run-dino {
+  0% { left: -80px; }
+  100% { left: 110%; }
+}
+
+@keyframes run-dino-reverse {
+  0% { right: -80px; }
+  100% { right: 110%; }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -110,4 +120,18 @@
 
 .animate-wiggle {
   animation: wiggle 4s ease-in-out infinite;
+}
+
+.animate-run-dino {
+  animation: run-dino 18s linear infinite;
+}
+
+.animate-run-dino-slow {
+  animation: run-dino 28s linear infinite;
+  animation-delay: 5s;
+}
+
+.animate-run-dino-reverse {
+  animation: run-dino-reverse 22s linear infinite;
+  animation-delay: 10s;
 }
