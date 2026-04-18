@@ -36,30 +36,7 @@ const RsvpSection = () => {
     }
 
     setLoading(true);
-    const trimmedName = form.fullName.trim();
-
-    // Check for duplicate name (case-insensitive)
-    const { data: existing, error: checkError } = await supabase
-      .from("rsvp_submissions")
-      .select("id")
-      .ilike("full_name", trimmedName)
-      .limit(1);
-
-    if (checkError) {
-      setLoading(false);
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
-      return;
-    }
-
-    if (existing && existing.length > 0) {
-      setLoading(false);
-      toast({
-        title: "This name has already RSVP'd 🦕",
-        description: "Looks like someone with this name already responded. Please double-check or use a different name.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const trimmedName = form.fullName.trim().replace(/\s+/g, " ");
 
     const { error } = await supabase.from("rsvp_submissions").insert({
       full_name: trimmedName,
@@ -71,6 +48,15 @@ const RsvpSection = () => {
 
     setLoading(false);
     if (error) {
+      // Postgres unique violation
+      if (error.code === "23505" || error.message?.toLowerCase().includes("duplicate")) {
+        toast({
+          title: "This name has already RSVP'd 🦕",
+          description: "Looks like someone with this name already responded. Please double-check or use a different name.",
+          variant: "destructive",
+        });
+        return;
+      }
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
       return;
     }
