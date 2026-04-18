@@ -5,6 +5,19 @@ import { Input } from "@/components/ui/input";
 import AdminSettingsEditor from "@/components/AdminSettingsEditor";
 import BabyPhotoUpload from "@/components/BabyPhotoUpload";
 import AdminWishlistManager from "@/components/AdminWishlistManager";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface RsvpEntry {
   id: string;
