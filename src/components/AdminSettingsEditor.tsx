@@ -20,8 +20,10 @@ const FIELDS: SettingField[] = [
   { key: "reception_venue", label: "Reception Venue", type: "input" },
   { key: "reception_address", label: "Reception Address", type: "input" },
   { key: "reception_time", label: "Reception Time Range", type: "input" },
-  { key: "map_embed_url", label: "Google Maps Embed URL", type: "textarea" },
-  { key: "map_direct_link", label: "Google Maps Direct Link", type: "input" },
+  { key: "map_embed_url", label: "Church Map — Google Maps Embed URL", type: "textarea" },
+  { key: "map_direct_link", label: "Church Map — Google Maps Direct Link", type: "input" },
+  { key: "reception_map_embed_url", label: "Reception Map — Google Maps Embed URL", type: "textarea" },
+  { key: "reception_map_direct_link", label: "Reception Map — Google Maps Direct Link", type: "input" },
   { key: "dress_code", label: "Dress Code", type: "input" },
   { key: "special_note", label: "Special Note", type: "textarea" },
 ];

@@ -13,6 +13,8 @@ export interface EventSettings {
   reception_time: string;
   map_embed_url: string;
   map_direct_link: string;
+  reception_map_embed_url: string;
+  reception_map_direct_link: string;
   dress_code: string;
   special_note: string;
 }
@@ -28,6 +30,8 @@ const DEFAULTS: EventSettings = {
   reception_time: EVENT_CONFIG.reception.time,
   map_embed_url: EVENT_CONFIG.map.embedUrl,
   map_direct_link: EVENT_CONFIG.map.directLink,
+  reception_map_embed_url: "",
+  reception_map_direct_link: "",
   dress_code: EVENT_CONFIG.dressCode,
   special_note: EVENT_CONFIG.specialNote,
 };
