@@ -30,12 +30,26 @@ interface RsvpEntry {
 }
 
 const Admin = () => {
+  const { toast } = useToast();
   const [authenticated, setAuthenticated] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(true);
   const [loginError, setLoginError] = useState("");
   const [rsvps, setRsvps] = useState<RsvpEntry[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteRsvp = async (id: string, name: string) => {
+    setDeletingId(id);
+    const { error } = await supabase.from("rsvp_submissions").delete().eq("id", id);
+    setDeletingId(null);
+    if (error) {
+      toast({ title: "Failed to delete", description: error.message, variant: "destructive" });
+      return;
+    }
+    setRsvps((prev) => prev.filter((r) => r.id !== id));
+    toast({ title: `Removed ${name}'s RSVP 🦕` });
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
