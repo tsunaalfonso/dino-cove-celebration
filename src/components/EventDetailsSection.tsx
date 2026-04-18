@@ -59,6 +59,18 @@ const EventDetailsSection = ({ settings }: Props) => {
           <div className="bg-dino-yellow/20 rounded-2xl p-6 border border-dino-yellow/30">
             <h4 className="font-heading text-lg text-foreground mb-2">👗 Dress Code</h4>
             <p className="text-sm font-body text-muted-foreground">{settings?.dress_code || EVENT_CONFIG.dressCode}</p>
+            {settings?.dress_code_color && (
+              <div className="flex items-center gap-2 mt-3">
+                <span
+                  className="inline-block h-7 w-7 rounded-full border-2 border-background shadow-sm ring-1 ring-border"
+                  style={{ backgroundColor: settings.dress_code_color }}
+                  aria-label={`Dress code color ${settings.dress_code_color}`}
+                />
+                <span className="text-xs font-body font-semibold text-foreground/80 uppercase tracking-wide">
+                  {settings.dress_code_color}
+                </span>
+              </div>
+            )}
           </div>
           <div className="bg-dino-blue/20 rounded-2xl p-6 border border-dino-blue/30">
             <h4 className="font-heading text-lg text-foreground mb-2">📝 Special Note</h4>

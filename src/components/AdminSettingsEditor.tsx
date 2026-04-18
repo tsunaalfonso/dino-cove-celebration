@@ -8,7 +8,7 @@ import { toast } from "sonner";
 interface SettingField {
   key: string;
   label: string;
-  type: "input" | "textarea";
+  type: "input" | "textarea" | "color";
 }
 
 const FIELDS: SettingField[] = [
@@ -25,6 +25,7 @@ const FIELDS: SettingField[] = [
   { key: "reception_map_embed_url", label: "Reception Map — Google Maps Embed URL", type: "textarea" },
   { key: "reception_map_direct_link", label: "Reception Map — Google Maps Direct Link", type: "input" },
   { key: "dress_code", label: "Dress Code", type: "input" },
+  { key: "dress_code_color", label: "Dress Code Color", type: "color" },
   { key: "special_note", label: "Special Note", type: "textarea" },
 ];
 
@@ -84,6 +85,22 @@ const AdminSettingsEditor = () => {
                 className="rounded-xl font-body text-sm"
                 rows={3}
               />
+            ) : field.type === "color" ? (
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={values[field.key] || "#A8D5BA"}
+                  onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
+                  className="h-11 w-16 rounded-xl border border-input cursor-pointer bg-background"
+                  aria-label={field.label}
+                />
+                <Input
+                  value={values[field.key] || ""}
+                  onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
+                  placeholder="#A8D5BA"
+                  className="rounded-xl font-body flex-1"
+                />
+              </div>
             ) : (
               <Input
                 value={values[field.key] || ""}

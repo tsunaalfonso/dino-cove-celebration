@@ -16,6 +16,7 @@ export interface EventSettings {
   reception_map_embed_url: string;
   reception_map_direct_link: string;
   dress_code: string;
+  dress_code_color: string;
   special_note: string;
 }
 
@@ -33,6 +34,7 @@ const DEFAULTS: EventSettings = {
   reception_map_embed_url: "",
   reception_map_direct_link: "",
   dress_code: EVENT_CONFIG.dressCode,
+  dress_code_color: "#A8D5BA",
   special_note: EVENT_CONFIG.specialNote,
 };
 
