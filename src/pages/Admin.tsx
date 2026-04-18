@@ -205,6 +205,38 @@ const Admin = () => {
                       <td className="p-3 text-muted-foreground text-xs">
                         {new Date(r.created_at).toLocaleDateString()}
                       </td>
+                      <td className="p-3 text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={deletingId === r.id}
+                              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-full"
+                              aria-label={`Delete ${r.full_name}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this RSVP?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently remove <span className="font-semibold text-foreground">{r.full_name}</span>'s RSVP. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteRsvp(r.id, r.full_name)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </td>
                     </tr>
                   ))
                 )}
