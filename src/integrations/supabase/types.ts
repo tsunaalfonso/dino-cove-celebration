@@ -65,6 +65,39 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlist_items: {
+        Row: {
+          claimed: boolean
+          created_at: string
+          id: string
+          image_url: string | null
+          link: string | null
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          claimed?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link?: string | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          claimed?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link?: string | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

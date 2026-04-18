@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AdminSettingsEditor from "@/components/AdminSettingsEditor";
 import BabyPhotoUpload from "@/components/BabyPhotoUpload";
+import AdminWishlistManager from "@/components/AdminWishlistManager";
 
 interface RsvpEntry {
   id: string;
@@ -125,6 +126,11 @@ const Admin = () => {
         {/* Baby Photo Upload */}
         <div className="mb-8">
           <BabyPhotoUpload />
+        </div>
+
+        {/* Wishlist Manager */}
+        <div className="mb-8">
+          <AdminWishlistManager />
         </div>
 
         {/* Table */}

@@ -36,8 +36,33 @@ const RsvpSection = () => {
     }
 
     setLoading(true);
+    const trimmedName = form.fullName.trim();
+
+    // Check for duplicate name (case-insensitive)
+    const { data: existing, error: checkError } = await supabase
+      .from("rsvp_submissions")
+      .select("id")
+      .ilike("full_name", trimmedName)
+      .limit(1);
+
+    if (checkError) {
+      setLoading(false);
+      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+      return;
+    }
+
+    if (existing && existing.length > 0) {
+      setLoading(false);
+      toast({
+        title: "This name has already RSVP'd 🦕",
+        description: "Looks like someone with this name already responded. Please double-check or use a different name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase.from("rsvp_submissions").insert({
-      full_name: form.fullName.trim(),
+      full_name: trimmedName,
       mobile_number: form.mobileNumber.trim() || null,
       attendance_status: form.attending,
       guest_count: form.attending === "yes" ? form.guestCount : 0,
