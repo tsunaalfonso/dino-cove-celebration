@@ -5,6 +5,19 @@ import { Input } from "@/components/ui/input";
 import AdminSettingsEditor from "@/components/AdminSettingsEditor";
 import BabyPhotoUpload from "@/components/BabyPhotoUpload";
 import AdminWishlistManager from "@/components/AdminWishlistManager";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface RsvpEntry {
   id: string;
@@ -17,12 +30,26 @@ interface RsvpEntry {
 }
 
 const Admin = () => {
+  const { toast } = useToast();
   const [authenticated, setAuthenticated] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(true);
   const [loginError, setLoginError] = useState("");
   const [rsvps, setRsvps] = useState<RsvpEntry[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteRsvp = async (id: string, name: string) => {
+    setDeletingId(id);
+    const { error } = await supabase.from("rsvp_submissions").delete().eq("id", id);
+    setDeletingId(null);
+    if (error) {
+      toast({ title: "Failed to delete", description: error.message, variant: "destructive" });
+      return;
+    }
+    setRsvps((prev) => prev.filter((r) => r.id !== id));
+    toast({ title: `Removed ${name}'s RSVP 🦕` });
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -145,12 +172,13 @@ const Admin = () => {
                   <th className="text-left p-3 font-semibold text-foreground hidden md:table-cell">Mobile</th>
                   <th className="text-left p-3 font-semibold text-foreground hidden md:table-cell">Message</th>
                   <th className="text-left p-3 font-semibold text-foreground">Date</th>
+                  <th className="text-right p-3 font-semibold text-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {rsvps.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <td colSpan={7} className="text-center py-8 text-muted-foreground">
                       No RSVP submissions yet 🥚
                     </td>
                   </tr>
@@ -176,6 +204,38 @@ const Admin = () => {
                       </td>
                       <td className="p-3 text-muted-foreground text-xs">
                         {new Date(r.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="p-3 text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={deletingId === r.id}
+                              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-full"
+                              aria-label={`Delete ${r.full_name}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this RSVP?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently remove <span className="font-semibold text-foreground">{r.full_name}</span>'s RSVP. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteRsvp(r.id, r.full_name)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </td>
                     </tr>
                   ))
