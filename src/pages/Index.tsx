@@ -5,6 +5,7 @@ import EventDetailsSection from "@/components/EventDetailsSection";
 import BabyPhotoSection from "@/components/BabyPhotoSection";
 import MapSection from "@/components/MapSection";
 import RsvpSection from "@/components/RsvpSection";
+import WishlistSection from "@/components/WishlistSection";
 import Footer from "@/components/Footer";
 import { useEventSettings } from "@/hooks/useEventSettings";
 
@@ -32,6 +33,7 @@ const Index = () => {
       <BabyPhotoSection />
       <MapSection settings={settings} />
       <RsvpSection />
+      <WishlistSection />
       <Footer />
     </div>
   );
