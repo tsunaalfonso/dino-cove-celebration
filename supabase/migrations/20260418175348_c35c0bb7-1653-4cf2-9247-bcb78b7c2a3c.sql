@@ -1,0 +1,1 @@
+INSERT INTO public.event_settings (key, value) VALUES ('dress_code_color', '#A8D5BA') ON CONFLICT (key) DO NOTHING;
