@@ -172,12 +172,13 @@ const Admin = () => {
                   <th className="text-left p-3 font-semibold text-foreground hidden md:table-cell">Mobile</th>
                   <th className="text-left p-3 font-semibold text-foreground hidden md:table-cell">Message</th>
                   <th className="text-left p-3 font-semibold text-foreground">Date</th>
+                  <th className="text-right p-3 font-semibold text-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {rsvps.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <td colSpan={7} className="text-center py-8 text-muted-foreground">
                       No RSVP submissions yet 🥚
                     </td>
                   </tr>
