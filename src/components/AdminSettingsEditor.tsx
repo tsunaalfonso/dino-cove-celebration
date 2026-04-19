@@ -31,6 +31,7 @@ const FIELDS: SettingField[] = [
 
 const AdminSettingsEditor = () => {
   const [values, setValues] = useState<Record<string, string>>({});
+  const [dressColors, setDressColors] = useState<DressCodeColor[]>([]);
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -45,15 +46,31 @@ const AdminSettingsEditor = () => {
             map[row.key] = row.value;
           });
           setValues(map);
+          setDressColors(parseDressCodeColors(map["dress_code_color"]));
         }
         setLoaded(true);
       });
   }, []);
 
+  const updateColor = (idx: number, patch: Partial<DressCodeColor>) => {
+    setDressColors((prev) => prev.map((c, i) => (i === idx ? { ...c, ...patch } : c)));
+  };
+  const addColor = () => {
+    if (dressColors.length >= 3) return;
+    setDressColors((prev) => [...prev, { name: "", hex: "#A8D5BA" }]);
+  };
+  const removeColor = (idx: number) => {
+    setDressColors((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      const promises = Object.entries(values).map(([key, value]) =>
+      const payload: Record<string, string> = {
+        ...values,
+        dress_code_color: serializeDressCodeColors(dressColors),
+      };
+      const promises = Object.entries(payload).map(([key, value]) =>
         supabase
           .from("event_settings")
           .update({ value, updated_at: new Date().toISOString() })
@@ -85,22 +102,6 @@ const AdminSettingsEditor = () => {
                 className="rounded-xl font-body text-sm"
                 rows={3}
               />
-            ) : field.type === "color" ? (
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={values[field.key] || "#A8D5BA"}
-                  onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
-                  className="h-11 w-16 rounded-xl border border-input cursor-pointer bg-background"
-                  aria-label={field.label}
-                />
-                <Input
-                  value={values[field.key] || ""}
-                  onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
-                  placeholder="#A8D5BA"
-                  className="rounded-xl font-body flex-1"
-                />
-              </div>
             ) : (
               <Input
                 value={values[field.key] || ""}
@@ -111,6 +112,64 @@ const AdminSettingsEditor = () => {
           </div>
         ))}
       </div>
+
+      {/* Dress code colors editor */}
+      <div className="mt-6 pt-5 border-t border-border">
+        <div className="flex items-center justify-between mb-3">
+          <label className="block text-sm font-body font-semibold text-foreground">
+            👗 Dress Code Colors (up to 3)
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addColor}
+            disabled={dressColors.length >= 3}
+            className="rounded-full font-body"
+          >
+            + Add Color
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {dressColors.length === 0 && (
+            <p className="text-xs font-body text-muted-foreground">No colors yet. Click "Add Color" to start.</p>
+          )}
+          {dressColors.map((color, idx) => (
+            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-background">
+              <input
+                type="color"
+                value={color.hex || "#A8D5BA"}
+                onChange={(e) => updateColor(idx, { hex: e.target.value })}
+                className="h-11 w-14 rounded-lg border border-input cursor-pointer bg-background flex-shrink-0"
+                aria-label={`Color ${idx + 1} picker`}
+              />
+              <Input
+                value={color.name}
+                onChange={(e) => updateColor(idx, { name: e.target.value })}
+                placeholder="Color name (e.g. Sage Green)"
+                className="rounded-xl font-body flex-1"
+              />
+              <Input
+                value={color.hex}
+                onChange={(e) => updateColor(idx, { hex: e.target.value })}
+                placeholder="#A8D5BA"
+                className="rounded-xl font-body w-28"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeColor(idx)}
+                className="rounded-full text-destructive hover:text-destructive"
+                aria-label="Remove color"
+              >
+                ✕
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <Button onClick={handleSave} disabled={saving} className="mt-5 rounded-full font-heading">
         {saving ? "Saving..." : "Save Settings 🦖"}
       </Button>
