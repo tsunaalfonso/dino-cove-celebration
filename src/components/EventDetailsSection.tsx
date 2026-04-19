@@ -60,18 +60,26 @@ const EventDetailsSection = ({ settings }: Props) => {
           <div className="bg-dino-yellow/20 rounded-2xl p-6 border border-dino-yellow/30">
             <h4 className="font-heading text-lg text-foreground mb-2">👗 Dress Code</h4>
             <p className="text-sm font-body text-muted-foreground">{settings?.dress_code || EVENT_CONFIG.dressCode}</p>
-            {settings?.dress_code_color && (
-              <div className="flex items-center gap-2 mt-3">
-                <span
-                  className="inline-block h-7 w-7 rounded-full border-2 border-background shadow-sm ring-1 ring-border"
-                  style={{ backgroundColor: settings.dress_code_color }}
-                  aria-label={`Dress code color ${settings.dress_code_color}`}
-                />
-                <span className="text-xs font-body font-semibold text-foreground/80 uppercase tracking-wide">
-                  {settings.dress_code_color}
-                </span>
-              </div>
-            )}
+            {(() => {
+              const colors = parseDressCodeColors(settings?.dress_code_color);
+              if (colors.length === 0) return null;
+              return (
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {colors.map((c, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-background/60 rounded-full pl-1 pr-3 py-1 border border-border">
+                      <span
+                        className="inline-block h-6 w-6 rounded-full border-2 border-background shadow-sm ring-1 ring-border"
+                        style={{ backgroundColor: c.hex }}
+                        aria-label={`Dress code color ${c.name || c.hex}`}
+                      />
+                      <span className="text-xs font-body font-semibold text-foreground/80">
+                        {c.name || c.hex}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
           <div className="bg-dino-blue/20 rounded-2xl p-6 border border-dino-blue/30">
             <h4 className="font-heading text-lg text-foreground mb-2">📝 Special Note</h4>
