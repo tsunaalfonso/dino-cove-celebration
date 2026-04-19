@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { EventSettings } from "@/hooks/useEventSettings";
 import { EVENT_CONFIG } from "@/lib/eventConfig";
+import { parseDressCodeColors } from "@/lib/dressCodeColors";
 
 const SectionDivider = () => (
   <div className="flex items-center justify-center gap-3 my-4">
