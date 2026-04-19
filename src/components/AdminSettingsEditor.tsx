@@ -26,7 +26,6 @@ const FIELDS: SettingField[] = [
   { key: "reception_map_embed_url", label: "Reception Map — Google Maps Embed URL", type: "textarea" },
   { key: "reception_map_direct_link", label: "Reception Map — Google Maps Direct Link", type: "input" },
   { key: "dress_code", label: "Dress Code", type: "input" },
-  { key: "dress_code_color", label: "Dress Code Color", type: "color" },
   { key: "special_note", label: "Special Note", type: "textarea" },
 ];
 
