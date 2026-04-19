@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { parseDressCodeColors, serializeDressCodeColors, type DressCodeColor } from "@/lib/dressCodeColors";
 
 interface SettingField {
   key: string;
   label: string;
-  type: "input" | "textarea" | "color";
+  type: "input" | "textarea";
 }
 
 const FIELDS: SettingField[] = [
