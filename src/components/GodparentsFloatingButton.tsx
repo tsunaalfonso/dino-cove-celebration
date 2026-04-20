@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Users } from "lucide-react";
 
 interface Godparent {
   id: string;
@@ -10,9 +9,14 @@ interface Godparent {
   sort_order: number;
 }
 
+const SPARKLE_COUNT = 8;
+
 const GodparentsFloatingButton = () => {
   const [items, setItems] = useState<Godparent[]>([]);
   const [open, setOpen] = useState(false);
+  const [shaking, setShaking] = useState(false);
+  const [sparkles, setSparkles] = useState<{ id: number; tx: string; ty: string; emoji: string }[]>([]);
+  const sparkleId = useRef(0);
 
   useEffect(() => {
     supabase
@@ -25,6 +29,26 @@ const GodparentsFloatingButton = () => {
       });
   }, []);
 
+  const triggerEffect = () => {
+    setShaking(true);
+    const emojis = ["✨", "💫", "⭐", "🦕", "🦖"];
+    const burst = Array.from({ length: SPARKLE_COUNT }).map(() => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 60 + Math.random() * 40;
+      return {
+        id: ++sparkleId.current,
+        tx: `${Math.cos(angle) * dist - 50}%`,
+        ty: `${Math.sin(angle) * dist - 50}%`,
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+      };
+    });
+    setSparkles((prev) => [...prev, ...burst]);
+    setTimeout(() => setShaking(false), 600);
+    setTimeout(() => {
+      setSparkles((prev) => prev.filter((s) => !burst.find((b) => b.id === s.id)));
+    }, 800);
+  };
+
   if (items.length === 0) return null;
 
   const ninongs = items.filter((i) => i.role === "ninong");
@@ -35,13 +59,50 @@ const GodparentsFloatingButton = () => {
       <SheetTrigger asChild>
         <button
           aria-label="View Ninongs and Ninangs"
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-3 shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-transform animate-bounce-gentle font-heading"
+          onClick={triggerEffect}
+          className="fixed bottom-6 right-6 z-40 group"
         >
-          <Users className="h-5 w-5" />
-          <span className="hidden sm:inline text-sm">Ninongs & Ninangs</span>
-          <span className="sm:hidden text-sm">Godparents</span>
+          {/* Sparkle burst layer */}
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            {sparkles.map((s) => (
+              <span
+                key={s.id}
+                className="absolute left-1/2 top-1/2 text-lg animate-sparkle"
+                style={{ ["--tx" as string]: s.tx, ["--ty" as string]: s.ty }}
+              >
+                {s.emoji}
+              </span>
+            ))}
+          </span>
+
+          {/* Egg shape */}
+          <span
+            className={`relative flex h-20 w-16 items-center justify-center rounded-[50%/55%_55%_45%_45%] bg-gradient-to-br from-dino-blue via-dino-yellow to-dino-orange border-2 border-background shadow-lg shadow-primary/30 animate-egg-glow transition-transform duration-200 group-hover:scale-110 group-active:scale-95 ${
+              shaking ? "animate-egg-shake" : "animate-egg-idle"
+            }`}
+          >
+            {/* Egg spots */}
+            <span className="absolute top-3 left-2 h-2 w-3 rounded-full bg-foreground/15 rotate-12" />
+            <span className="absolute top-7 right-2 h-1.5 w-2 rounded-full bg-foreground/20" />
+            <span className="absolute bottom-4 left-3 h-2 w-2.5 rounded-full bg-foreground/15 -rotate-12" />
+            <span className="absolute bottom-6 right-3 h-1 w-1.5 rounded-full bg-foreground/20" />
+
+            {/* Crack hint on hover */}
+            <span className="absolute inset-x-3 top-6 h-0.5 bg-foreground/0 group-hover:bg-foreground/30 transition-colors" />
+
+            {/* Tiny dino peeking */}
+            <span className="text-2xl drop-shadow-sm transition-transform group-hover:scale-110">
+              🦕
+            </span>
+          </span>
+
+          {/* Label badge */}
+          <span className="absolute -top-2 -left-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap">
+            Tap me!
+          </span>
         </button>
       </SheetTrigger>
+
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="font-heading text-2xl text-primary">
