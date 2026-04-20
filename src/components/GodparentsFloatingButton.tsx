@@ -11,16 +11,22 @@ interface Godparent {
 
 const SPARKLE_COUNT = 10;
 
+const TAPPED_KEY = "godparents-egg-tapped";
+
 const GodparentsFloatingButton = () => {
   const [items, setItems] = useState<Godparent[]>([]);
   const [open, setOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [cracking, setCracking] = useState(false);
+  const [hasTapped, setHasTapped] = useState(false);
   const [sparkles, setSparkles] = useState<{ id: number; tx: string; ty: string; emoji: string }[]>([]);
   const sparkleId = useRef(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem(TAPPED_KEY) === "1") {
+      setHasTapped(true);
+    }
     supabase
       .from("godparents")
       .select("*")
