@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import AdminSettingsEditor from "@/components/AdminSettingsEditor";
 import BabyPhotoUpload from "@/components/BabyPhotoUpload";
 import AdminWishlistManager from "@/components/AdminWishlistManager";
+import AdminGodparentsManager from "@/components/AdminGodparentsManager";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 import {
@@ -158,6 +159,11 @@ const Admin = () => {
         {/* Wishlist Manager */}
         <div className="mb-8">
           <AdminWishlistManager />
+        </div>
+
+        {/* Godparents Manager */}
+        <div className="mb-8">
+          <AdminGodparentsManager />
         </div>
 
         {/* Table */}

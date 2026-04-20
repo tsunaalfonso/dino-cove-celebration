@@ -7,6 +7,7 @@ import MapSection from "@/components/MapSection";
 import RsvpSection from "@/components/RsvpSection";
 import WishlistSection from "@/components/WishlistSection";
 import Footer from "@/components/Footer";
+import GodparentsFloatingButton from "@/components/GodparentsFloatingButton";
 import { useEventSettings } from "@/hooks/useEventSettings";
 
 const Index = () => {
@@ -35,6 +36,7 @@ const Index = () => {
       <RsvpSection />
       <WishlistSection />
       <Footer />
+      <GodparentsFloatingButton />
     </div>
   );
 };
