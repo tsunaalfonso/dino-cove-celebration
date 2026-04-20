@@ -59,12 +59,12 @@ const WishlistSection = () => {
               transition={{ delay: idx * 0.05 }}
               className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col"
             >
-              <div className="relative w-full aspect-square bg-muted">
+              <div className="relative w-full aspect-square bg-muted flex items-center justify-center">
                 {item.image_url ? (
                   <img
                     src={item.image_url}
                     alt={item.name}
-                    className={`w-full h-full object-cover ${item.claimed ? "opacity-60" : ""}`}
+                    className={`w-full h-full object-contain p-2 ${item.claimed ? "opacity-60" : ""}`}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
