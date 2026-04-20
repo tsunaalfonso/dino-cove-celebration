@@ -11,16 +11,22 @@ interface Godparent {
 
 const SPARKLE_COUNT = 10;
 
+const TAPPED_KEY = "godparents-egg-tapped";
+
 const GodparentsFloatingButton = () => {
   const [items, setItems] = useState<Godparent[]>([]);
   const [open, setOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [cracking, setCracking] = useState(false);
+  const [hasTapped, setHasTapped] = useState(false);
   const [sparkles, setSparkles] = useState<{ id: number; tx: string; ty: string; emoji: string }[]>([]);
   const sparkleId = useRef(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem(TAPPED_KEY) === "1") {
+      setHasTapped(true);
+    }
     supabase
       .from("godparents")
       .select("*")
@@ -83,6 +89,14 @@ const GodparentsFloatingButton = () => {
     playCrackSound();
     setCracking(true);
     setShaking(true);
+    if (!hasTapped) {
+      setHasTapped(true);
+      try {
+        localStorage.setItem(TAPPED_KEY, "1");
+      } catch {
+        // ignore storage errors
+      }
+    }
 
     const emojis = ["✨", "💫", "⭐", "🦕", "🦖"];
     const burst = Array.from({ length: SPARKLE_COUNT }).map(() => {
@@ -100,11 +114,11 @@ const GodparentsFloatingButton = () => {
     setTimeout(() => setShaking(false), 300);
     setTimeout(() => {
       setOpen(true);
-    }, 550);
+    }, 700);
     setTimeout(() => {
       setCracking(false);
       setSparkles((prev) => prev.filter((s) => !burst.find((b) => b.id === s.id)));
-    }, 900);
+    }, 1100);
   };
 
   if (items.length === 0) return null;
@@ -189,10 +203,12 @@ const GodparentsFloatingButton = () => {
             )}
           </span>
 
-          {/* Label badge */}
-          <span className="absolute -top-2 -left-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap">
-            Tap me!
-          </span>
+          {/* Label badge — only shown until first tap */}
+          {!hasTapped && (
+            <span className="absolute -top-2 -left-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap animate-bounce-gentle">
+              Tap me!
+            </span>
+          )}
         </button>
       </SheetTrigger>
 

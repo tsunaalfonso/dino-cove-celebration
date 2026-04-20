@@ -169,14 +169,16 @@
 
 @keyframes egg-crack-top {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  30% { transform: translateY(-4px) rotate(-6deg); }
-  100% { transform: translateY(-30px) rotate(-25deg); opacity: 0; }
+  20% { transform: translateY(-6px) rotate(-8deg); opacity: 1; }
+  60% { transform: translate(-18px, 20px) rotate(-55deg); opacity: 1; }
+  100% { transform: translate(-30px, 70px) rotate(-95deg); opacity: 0; }
 }
 
 @keyframes egg-crack-bottom {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  30% { transform: translateY(2px) rotate(4deg); }
-  100% { transform: translateY(20px) rotate(15deg); opacity: 0; }
+  20% { transform: translateY(2px) rotate(6deg); opacity: 1; }
+  60% { transform: translate(16px, 24px) rotate(45deg); opacity: 1; }
+  100% { transform: translate(30px, 75px) rotate(80deg); opacity: 0; }
 }
 
 @keyframes crack-flash {
@@ -189,7 +191,7 @@
 .animate-egg-pop { animation: egg-pop 0.5s ease-out; }
 .animate-egg-glow { animation: egg-glow 2.5s ease-in-out infinite; }
 .animate-sparkle { animation: sparkle-burst 0.7s ease-out forwards; }
-.animate-egg-crack-top { animation: egg-crack-top 0.6s ease-in forwards; }
-.animate-egg-crack-bottom { animation: egg-crack-bottom 0.6s ease-in forwards; }
+.animate-egg-crack-top { animation: egg-crack-top 0.9s cubic-bezier(0.34, 0.01, 0.56, 1) forwards; }
+.animate-egg-crack-bottom { animation: egg-crack-bottom 0.9s cubic-bezier(0.34, 0.01, 0.56, 1) forwards; }
 .animate-crack-flash { animation: crack-flash 0.6s ease-out forwards; }
 
