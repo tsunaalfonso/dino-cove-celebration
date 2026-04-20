@@ -90,10 +90,10 @@ const GodparentsFloatingButton = () => {
                 {ninangs.map((g, i) => (
                   <li
                     key={g.id}
-                    className="flex items-center gap-3 p-3 rounded-2xl bg-dino-pink/15 border border-border animate-fade-in"
+                    className="flex items-center gap-3 p-3 rounded-2xl bg-dino-orange/15 border border-border animate-fade-in"
                     style={{ animationDelay: `${i * 60}ms` }}
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-dino-pink/40 text-foreground font-heading text-sm">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-dino-orange/40 text-foreground font-heading text-sm">
                       {i + 1}
                     </span>
                     <span className="font-body font-semibold text-foreground">{g.name}</span>
