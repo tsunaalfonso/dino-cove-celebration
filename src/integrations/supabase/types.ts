@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      godparents: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          role: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          role: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          role?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rsvp_submissions: {
         Row: {
           attendance_status: string
