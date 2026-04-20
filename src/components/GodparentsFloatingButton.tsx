@@ -9,14 +9,16 @@ interface Godparent {
   sort_order: number;
 }
 
-const SPARKLE_COUNT = 8;
+const SPARKLE_COUNT = 10;
 
 const GodparentsFloatingButton = () => {
   const [items, setItems] = useState<Godparent[]>([]);
   const [open, setOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
+  const [cracking, setCracking] = useState(false);
   const [sparkles, setSparkles] = useState<{ id: number; tx: string; ty: string; emoji: string }[]>([]);
   const sparkleId = useRef(0);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     supabase
@@ -29,12 +31,63 @@ const GodparentsFloatingButton = () => {
       });
   }, []);
 
-  const triggerEffect = () => {
+  const playCrackSound = () => {
+    try {
+      if (!audioCtxRef.current) {
+        const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new Ctx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") ctx.resume();
+      const now = ctx.currentTime;
+
+      // Crack: short noise burst with quick decay
+      const bufferSize = Math.floor(ctx.sampleRate * 0.25);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / bufferSize;
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 3);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = "highpass";
+      noiseFilter.frequency.value = 1500;
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.4, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      noise.connect(noiseFilter).connect(noiseGain).connect(ctx.destination);
+      noise.start(now);
+      noise.stop(now + 0.25);
+
+      // Tonal "pop" overlay
+      const osc = ctx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.18);
+      const oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(0.0001, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.25, now + 0.01);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc.connect(oscGain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch {
+      // Silently ignore audio errors
+    }
+  };
+
+  const triggerCrackAndOpen = () => {
+    if (cracking) return;
+    playCrackSound();
+    setCracking(true);
     setShaking(true);
+
     const emojis = ["✨", "💫", "⭐", "🦕", "🦖"];
     const burst = Array.from({ length: SPARKLE_COUNT }).map(() => {
       const angle = Math.random() * Math.PI * 2;
-      const dist = 60 + Math.random() * 40;
+      const dist = 70 + Math.random() * 50;
       return {
         id: ++sparkleId.current,
         tx: `${Math.cos(angle) * dist - 50}%`,
@@ -43,10 +96,15 @@ const GodparentsFloatingButton = () => {
       };
     });
     setSparkles((prev) => [...prev, ...burst]);
-    setTimeout(() => setShaking(false), 600);
+
+    setTimeout(() => setShaking(false), 300);
     setTimeout(() => {
+      setOpen(true);
+    }, 550);
+    setTimeout(() => {
+      setCracking(false);
       setSparkles((prev) => prev.filter((s) => !burst.find((b) => b.id === s.id)));
-    }, 800);
+    }, 900);
   };
 
   if (items.length === 0) return null;
@@ -59,7 +117,10 @@ const GodparentsFloatingButton = () => {
       <SheetTrigger asChild>
         <button
           aria-label="View Ninongs and Ninangs"
-          onClick={triggerEffect}
+          onClick={(e) => {
+            e.preventDefault();
+            triggerCrackAndOpen();
+          }}
           className="fixed bottom-6 right-6 z-40 group"
         >
           {/* Sparkle burst layer */}
@@ -75,25 +136,57 @@ const GodparentsFloatingButton = () => {
             ))}
           </span>
 
-          {/* Egg shape */}
-          <span
-            className={`relative flex h-20 w-16 items-center justify-center rounded-[50%/55%_55%_45%_45%] bg-gradient-to-br from-dino-blue via-dino-yellow to-dino-orange border-2 border-background shadow-lg shadow-primary/30 animate-egg-glow transition-transform duration-200 group-hover:scale-110 group-active:scale-95 ${
-              shaking ? "animate-egg-shake" : "animate-egg-idle"
-            }`}
-          >
-            {/* Egg spots */}
-            <span className="absolute top-3 left-2 h-2 w-3 rounded-full bg-foreground/15 rotate-12" />
-            <span className="absolute top-7 right-2 h-1.5 w-2 rounded-full bg-foreground/20" />
-            <span className="absolute bottom-4 left-3 h-2 w-2.5 rounded-full bg-foreground/15 -rotate-12" />
-            <span className="absolute bottom-6 right-3 h-1 w-1.5 rounded-full bg-foreground/20" />
+          {/* Egg container */}
+          <span className="relative block h-20 w-16">
+            {cracking ? (
+              <>
+                {/* Top half */}
+                <span
+                  className="absolute inset-x-0 top-0 h-1/2 overflow-hidden animate-egg-crack-top"
+                  style={{ borderRadius: "50%/110% 110% 0 0" }}
+                >
+                  <span
+                    className="absolute inset-0 bg-gradient-to-br from-dino-blue via-dino-yellow to-dino-orange border-2 border-background"
+                    style={{ height: "200%", borderRadius: "50%/55% 55% 27.5% 27.5%" }}
+                  />
+                </span>
+                {/* Bottom half */}
+                <span
+                  className="absolute inset-x-0 bottom-0 h-1/2 overflow-hidden animate-egg-crack-bottom"
+                  style={{ borderRadius: "50%/0 0 90% 90%" }}
+                >
+                  <span
+                    className="absolute inset-x-0 bottom-0 bg-gradient-to-br from-dino-blue via-dino-yellow to-dino-orange border-2 border-background"
+                    style={{ height: "200%", borderRadius: "50%/27.5% 27.5% 45% 45%" }}
+                  />
+                </span>
+                {/* Flash + dino reveal */}
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="absolute h-10 w-10 rounded-full bg-dino-yellow/70 blur-xl animate-crack-flash" />
+                  <span className="relative text-3xl animate-egg-pop drop-shadow-md">🦕</span>
+                </span>
+              </>
+            ) : (
+              <span
+                className={`relative flex h-20 w-16 items-center justify-center rounded-[50%/55%_55%_45%_45%] bg-gradient-to-br from-dino-blue via-dino-yellow to-dino-orange border-2 border-background shadow-lg shadow-primary/30 animate-egg-glow transition-transform duration-200 group-hover:scale-110 group-active:scale-95 ${
+                  shaking ? "animate-egg-shake" : "animate-egg-idle"
+                }`}
+              >
+                {/* Egg spots */}
+                <span className="absolute top-3 left-2 h-2 w-3 rounded-full bg-foreground/15 rotate-12" />
+                <span className="absolute top-7 right-2 h-1.5 w-2 rounded-full bg-foreground/20" />
+                <span className="absolute bottom-4 left-3 h-2 w-2.5 rounded-full bg-foreground/15 -rotate-12" />
+                <span className="absolute bottom-6 right-3 h-1 w-1.5 rounded-full bg-foreground/20" />
 
-            {/* Crack hint on hover */}
-            <span className="absolute inset-x-3 top-6 h-0.5 bg-foreground/0 group-hover:bg-foreground/30 transition-colors" />
+                {/* Crack hint on hover */}
+                <span className="absolute inset-x-3 top-1/2 h-0.5 bg-foreground/0 group-hover:bg-foreground/30 transition-colors" />
 
-            {/* Tiny dino peeking */}
-            <span className="text-2xl drop-shadow-sm transition-transform group-hover:scale-110">
-              🦕
-            </span>
+                {/* Tiny dino peeking */}
+                <span className="text-2xl drop-shadow-sm transition-transform group-hover:scale-110">
+                  🦕
+                </span>
+              </span>
+            )}
           </span>
 
           {/* Label badge */}
