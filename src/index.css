@@ -191,7 +191,7 @@
 .animate-egg-pop { animation: egg-pop 0.5s ease-out; }
 .animate-egg-glow { animation: egg-glow 2.5s ease-in-out infinite; }
 .animate-sparkle { animation: sparkle-burst 0.7s ease-out forwards; }
-.animate-egg-crack-top { animation: egg-crack-top 0.6s ease-in forwards; }
-.animate-egg-crack-bottom { animation: egg-crack-bottom 0.6s ease-in forwards; }
+.animate-egg-crack-top { animation: egg-crack-top 0.9s cubic-bezier(0.34, 0.01, 0.56, 1) forwards; }
+.animate-egg-crack-bottom { animation: egg-crack-bottom 0.9s cubic-bezier(0.34, 0.01, 0.56, 1) forwards; }
 .animate-crack-flash { animation: crack-flash 0.6s ease-out forwards; }
 
