@@ -203,10 +203,12 @@ const GodparentsFloatingButton = () => {
             )}
           </span>
 
-          {/* Label badge */}
-          <span className="absolute -top-2 -left-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap">
-            Tap me!
-          </span>
+          {/* Label badge — only shown until first tap */}
+          {!hasTapped && (
+            <span className="absolute -top-2 -left-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap animate-bounce-gentle">
+              Tap me!
+            </span>
+          )}
         </button>
       </SheetTrigger>
 
