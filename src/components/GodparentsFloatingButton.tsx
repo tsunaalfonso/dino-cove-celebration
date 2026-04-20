@@ -89,6 +89,14 @@ const GodparentsFloatingButton = () => {
     playCrackSound();
     setCracking(true);
     setShaking(true);
+    if (!hasTapped) {
+      setHasTapped(true);
+      try {
+        localStorage.setItem(TAPPED_KEY, "1");
+      } catch {
+        // ignore storage errors
+      }
+    }
 
     const emojis = ["✨", "💫", "⭐", "🦕", "🦖"];
     const burst = Array.from({ length: SPARKLE_COUNT }).map(() => {
@@ -106,11 +114,11 @@ const GodparentsFloatingButton = () => {
     setTimeout(() => setShaking(false), 300);
     setTimeout(() => {
       setOpen(true);
-    }, 550);
+    }, 700);
     setTimeout(() => {
       setCracking(false);
       setSparkles((prev) => prev.filter((s) => !burst.find((b) => b.id === s.id)));
-    }, 900);
+    }, 1100);
   };
 
   if (items.length === 0) return null;
