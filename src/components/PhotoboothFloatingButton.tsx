@@ -189,7 +189,7 @@ const PhotoboothFloatingButton = () => {
 
           {/* Label */}
           <span className="absolute -top-2 -right-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap">
-            Photobooth
+            {settings.pb_button_label}
           </span>
         </span>
       </button>
@@ -218,12 +218,19 @@ const PhotoboothFloatingButton = () => {
                 />
                 {/* Live frame overlay preview */}
                 <div className="pointer-events-none absolute inset-0">
-                  <div className="absolute inset-2 rounded-xl border-4 border-transparent" style={{ borderImage: "linear-gradient(135deg, #A8DADC, #F6E27F, #F4A261) 1" }} />
-                  <span className="absolute top-3 left-3 text-2xl">🦕</span>
-                  <span className="absolute top-3 right-3 text-2xl">🥚</span>
+                  <div
+                    className="absolute inset-2 rounded-xl border-4 border-transparent"
+                    style={{ borderImage: `linear-gradient(135deg, ${settings.pb_border_color_1}, ${settings.pb_border_color_2}, ${settings.pb_border_color_3}) 1` }}
+                  />
+                  <span className="absolute top-3 left-3 text-2xl">{settings.pb_top_left_emoji}</span>
+                  <span className="absolute top-3 right-3 text-2xl">{settings.pb_top_right_emoji}</span>
                   <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-card/85 backdrop-blur-sm px-3 py-2 text-center">
-                    <p className="font-heading text-sm text-primary leading-tight">CAEL AVERY M. ALFONSO</p>
-                    <p className="font-body text-[10px] text-muted-foreground">🦕 Our Little Dino • Christening 🦕</p>
+                    <p className="font-heading text-sm leading-tight" style={{ color: settings.pb_name_color }}>
+                      {settings.pb_title}
+                    </p>
+                    <p className="font-body text-[10px]" style={{ color: settings.pb_subtitle_color }}>
+                      {settings.pb_subtitle}
+                    </p>
                   </div>
                 </div>
               </>
