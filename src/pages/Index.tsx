@@ -8,6 +8,7 @@ import RsvpSection from "@/components/RsvpSection";
 import WishlistSection from "@/components/WishlistSection";
 import Footer from "@/components/Footer";
 import GodparentsFloatingButton from "@/components/GodparentsFloatingButton";
+import PhotoboothFloatingButton from "@/components/PhotoboothFloatingButton";
 import { useEventSettings } from "@/hooks/useEventSettings";
 
 const Index = () => {
@@ -37,6 +38,7 @@ const Index = () => {
       <WishlistSection />
       <Footer />
       <GodparentsFloatingButton />
+      <PhotoboothFloatingButton />
     </div>
   );
 };
