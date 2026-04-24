@@ -147,13 +147,49 @@ const PhotoboothFloatingButton = () => {
     startCamera(facing);
   };
 
-  const download = () => {
+  const dataUrlToBlob = async (dataUrl: string) => {
+    const res = await fetch(dataUrl);
+    return res.blob();
+  };
+
+  const download = async () => {
     if (!snapshot) return;
-    const a = document.createElement("a");
-    a.href = snapshot;
-    a.download = `cael-photobooth-${Date.now()}.png`;
-    a.click();
-    toast.success("Photo saved! 🦕");
+    try {
+      const blob = await dataUrlToBlob(snapshot);
+      const filename = `cael-photobooth-${Date.now()}.png`;
+      const file = new File([blob], filename, { type: "image/png" });
+      const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+
+      // Mobile: use Web Share to save directly to Photos / Gallery
+      if (nav.canShare && nav.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: "Cael's Dino Photobooth",
+            text: "Saved from Cael's christening photobooth 🦕",
+          });
+          toast.success("Saved! Choose 'Save Image' to add to your gallery 📸");
+          return;
+        } catch (err) {
+          // User cancelled or share failed — fall through to download
+          if ((err as Error)?.name === "AbortError") return;
+        }
+      }
+
+      // Desktop fallback: trigger a real download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast.success("Photo downloaded! Check your Downloads or Gallery 🦕");
+    } catch (e) {
+      console.error(e);
+      toast.error("Couldn't save the photo. Try again.");
+    }
   };
 
   const flipCamera = () => {
