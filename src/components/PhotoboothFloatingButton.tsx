@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Camera, Download, RefreshCw, SwitchCamera } from "lucide-react";
 import { toast } from "sonner";
 import { usePhotoboothSettings } from "@/hooks/usePhotoboothSettings";
+import photoboothFrame from "@/assets/photobooth-frame.png";
 
 const PhotoboothFloatingButton = () => {
   const { settings } = usePhotoboothSettings();
@@ -13,6 +14,17 @@ const PhotoboothFloatingButton = () => {
   const [facing, setFacing] = useState<"user" | "environment">("user");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const frameImgRef = useRef<HTMLImageElement | null>(null);
+
+  // Preload frame image once
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = photoboothFrame;
+    img.onload = () => {
+      frameImgRef.current = img;
+    };
+  }, []);
 
   const stopStream = useCallback(() => {
     if (stream) {
@@ -55,79 +67,36 @@ const PhotoboothFloatingButton = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const drawFrame = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
-    // Outer pastel border
-    const border = Math.round(Math.min(w, h) * 0.045);
+  const drawNameOnCanvas = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
+    // Crisp blue outlined cartoon name across the top
+    const nameSize = Math.round(w * 0.052);
     ctx.save();
-    ctx.lineWidth = border;
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, settings.pb_border_color_1);
-    grad.addColorStop(0.5, settings.pb_border_color_2);
-    grad.addColorStop(1, settings.pb_border_color_3);
-    ctx.strokeStyle = grad;
-    ctx.strokeRect(border / 2, border / 2, w - border, h - border);
-    ctx.restore();
-
-    // Top corner emojis
-    const emojiSize = Math.round(Math.min(w, h) * 0.07);
-    ctx.font = `${emojiSize}px serif`;
-    ctx.textBaseline = "top";
-    ctx.fillText(settings.pb_top_left_emoji, border * 1.2, border * 1.2);
-    ctx.textAlign = "right";
-    ctx.fillText(settings.pb_top_right_emoji, w - border * 1.2, border * 1.2);
-    ctx.textAlign = "left";
-
-    // Bottom name plate
-    const plateH = Math.round(h * 0.13);
-    const plateY = h - plateH - border;
-    ctx.save();
-    const plateGrad = ctx.createLinearGradient(0, plateY, 0, plateY + plateH);
-    plateGrad.addColorStop(0, "rgba(255,255,255,0.92)");
-    plateGrad.addColorStop(1, "rgba(255,255,255,0.78)");
-    ctx.fillStyle = plateGrad;
-    const radius = plateH * 0.3;
-    const x = border;
-    const wPlate = w - border * 2;
-    ctx.beginPath();
-    ctx.moveTo(x + radius, plateY);
-    ctx.lineTo(x + wPlate - radius, plateY);
-    ctx.quadraticCurveTo(x + wPlate, plateY, x + wPlate, plateY + radius);
-    ctx.lineTo(x + wPlate, plateY + plateH - radius);
-    ctx.quadraticCurveTo(x + wPlate, plateY + plateH, x + wPlate - radius, plateY + plateH);
-    ctx.lineTo(x + radius, plateY + plateH);
-    ctx.quadraticCurveTo(x, plateY + plateH, x, plateY + plateH - radius);
-    ctx.lineTo(x, plateY + radius);
-    ctx.quadraticCurveTo(x, plateY, x + radius, plateY);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // Name text
-    ctx.fillStyle = settings.pb_name_color;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const nameSize = Math.round(plateH * 0.36);
     ctx.font = `bold ${nameSize}px "Fredoka One", "Nunito", sans-serif`;
-    ctx.fillText(settings.pb_title, w / 2, plateY + plateH * 0.38);
-
-    const subSize = Math.round(plateH * 0.22);
-    ctx.font = `600 ${subSize}px "Nunito", sans-serif`;
-    ctx.fillStyle = settings.pb_subtitle_color;
-    ctx.fillText(settings.pb_subtitle, w / 2, plateY + plateH * 0.74);
+    const y = Math.round(h * 0.13);
+    // Outline
+    ctx.lineWidth = Math.max(4, nameSize * 0.18);
+    ctx.strokeStyle = "#2563EB";
+    ctx.strokeText(settings.pb_title, w / 2, y);
+    // Fill
+    ctx.fillStyle = "#7DD3FC";
+    ctx.fillText(settings.pb_title, w / 2, y);
+    ctx.restore();
   };
 
   const capture = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-    const w = video.videoWidth || 720;
-    const h = video.videoHeight || 720;
+    const w = video.videoWidth || 1024;
+    const h = video.videoHeight || 1024;
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Mirror front camera
+    // Draw camera (mirrored if front-facing)
     if (facing === "user") {
       ctx.save();
       ctx.scale(-1, 1);
@@ -137,7 +106,14 @@ const PhotoboothFloatingButton = () => {
       ctx.drawImage(video, 0, 0, w, h);
     }
 
-    drawFrame(ctx, w, h);
+    // Overlay decorative dino frame PNG
+    if (frameImgRef.current) {
+      ctx.drawImage(frameImgRef.current, 0, 0, w, h);
+    }
+
+    // Crisp name on top
+    drawNameOnCanvas(ctx, w, h);
+
     setSnapshot(canvas.toDataURL("image/png"));
     stopStream();
   };
@@ -160,7 +136,6 @@ const PhotoboothFloatingButton = () => {
       const file = new File([blob], filename, { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
 
-      // Mobile: use Web Share to save directly to Photos / Gallery
       if (nav.canShare && nav.canShare({ files: [file] })) {
         try {
           await navigator.share({
@@ -171,12 +146,10 @@ const PhotoboothFloatingButton = () => {
           toast.success("Saved! Choose 'Save Image' to add to your gallery 📸");
           return;
         } catch (err) {
-          // User cancelled or share failed — fall through to download
           if ((err as Error)?.name === "AbortError") return;
         }
       }
 
-      // Desktop fallback: trigger a real download
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -193,8 +166,7 @@ const PhotoboothFloatingButton = () => {
   };
 
   const flipCamera = () => {
-    const next = facing === "user" ? "environment" : "user";
-    setFacing(next);
+    setFacing((f) => (f === "user" ? "environment" : "user"));
   };
 
   return (
@@ -205,16 +177,10 @@ const PhotoboothFloatingButton = () => {
         className="fixed bottom-6 left-6 z-40 group"
       >
         <span className="relative flex h-20 w-20 items-center justify-center">
-          {/* Glow */}
           <span className="absolute inset-0 rounded-full bg-gradient-to-br from-dino-green/40 via-dino-yellow/40 to-dino-orange/40 blur-md animate-egg-glow" />
-
-          {/* Dino head body */}
           <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-dino-green via-dino-blue to-dino-yellow border-2 border-background shadow-lg shadow-primary/30 transition-transform duration-200 group-hover:scale-110 group-active:scale-95 animate-bounce-gentle">
-            {/* Spots */}
             <span className="absolute top-2 left-2 h-1.5 w-1.5 rounded-full bg-foreground/20" />
             <span className="absolute bottom-3 right-3 h-1.5 w-1.5 rounded-full bg-foreground/15" />
-
-            {/* Camera icon over dino */}
             <span className="relative flex items-center justify-center">
               <span className="text-2xl drop-shadow-sm">🦖</span>
               <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-card border border-border shadow">
@@ -222,8 +188,6 @@ const PhotoboothFloatingButton = () => {
               </span>
             </span>
           </span>
-
-          {/* Label */}
           <span className="absolute -top-2 -right-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap">
             {settings.pb_button_label}
           </span>
@@ -237,11 +201,11 @@ const PhotoboothFloatingButton = () => {
               📸 Cael's Dino Photobooth
             </DialogTitle>
             <p className="text-sm font-body text-muted-foreground">
-              Snap a memory with our little dino frame! 🦕
+              Snap a memory with our jungle dino frame! 🦕
             </p>
           </DialogHeader>
 
-          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-muted border-4 border-dino-green/30 shadow-inner">
+          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-muted shadow-inner">
             {snapshot ? (
               <img src={snapshot} alt="Photobooth snapshot" className="w-full h-full object-contain" />
             ) : (
@@ -252,22 +216,25 @@ const PhotoboothFloatingButton = () => {
                   muted
                   className={`w-full h-full object-cover ${facing === "user" ? "scale-x-[-1]" : ""}`}
                 />
-                {/* Live frame overlay preview */}
-                <div className="pointer-events-none absolute inset-0">
-                  <div
-                    className="absolute inset-2 rounded-xl border-4 border-transparent"
-                    style={{ borderImage: `linear-gradient(135deg, ${settings.pb_border_color_1}, ${settings.pb_border_color_2}, ${settings.pb_border_color_3}) 1` }}
-                  />
-                  <span className="absolute top-3 left-3 text-2xl">{settings.pb_top_left_emoji}</span>
-                  <span className="absolute top-3 right-3 text-2xl">{settings.pb_top_right_emoji}</span>
-                  <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-card/85 backdrop-blur-sm px-3 py-2 text-center">
-                    <p className="font-heading text-sm leading-tight" style={{ color: settings.pb_name_color }}>
-                      {settings.pb_title}
-                    </p>
-                    <p className="font-body text-[10px]" style={{ color: settings.pb_subtitle_color }}>
-                      {settings.pb_subtitle}
-                    </p>
-                  </div>
+                {/* Decorative dino frame overlay */}
+                <img
+                  src={photoboothFrame}
+                  alt=""
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 w-full h-full object-cover select-none"
+                  draggable={false}
+                />
+                {/* Name across the top */}
+                <div className="pointer-events-none absolute top-[8%] left-0 right-0 text-center px-6">
+                  <h3
+                    className="font-heading text-lg sm:text-2xl tracking-wide leading-tight"
+                    style={{
+                      color: "#7DD3FC",
+                      WebkitTextStroke: "1.5px #2563EB",
+                    }}
+                  >
+                    {settings.pb_title}
+                  </h3>
                 </div>
               </>
             )}
