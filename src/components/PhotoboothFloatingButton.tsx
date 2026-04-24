@@ -3,8 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Camera, Download, RefreshCw, SwitchCamera } from "lucide-react";
 import { toast } from "sonner";
+import { usePhotoboothSettings } from "@/hooks/usePhotoboothSettings";
 
 const PhotoboothFloatingButton = () => {
+  const { settings } = usePhotoboothSettings();
   const [open, setOpen] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
@@ -59,9 +61,9 @@ const PhotoboothFloatingButton = () => {
     ctx.save();
     ctx.lineWidth = border;
     const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, "#A8DADC");
-    grad.addColorStop(0.5, "#F6E27F");
-    grad.addColorStop(1, "#F4A261");
+    grad.addColorStop(0, settings.pb_border_color_1);
+    grad.addColorStop(0.5, settings.pb_border_color_2);
+    grad.addColorStop(1, settings.pb_border_color_3);
     ctx.strokeStyle = grad;
     ctx.strokeRect(border / 2, border / 2, w - border, h - border);
     ctx.restore();
@@ -70,9 +72,9 @@ const PhotoboothFloatingButton = () => {
     const emojiSize = Math.round(Math.min(w, h) * 0.07);
     ctx.font = `${emojiSize}px serif`;
     ctx.textBaseline = "top";
-    ctx.fillText("🦕", border * 1.2, border * 1.2);
+    ctx.fillText(settings.pb_top_left_emoji, border * 1.2, border * 1.2);
     ctx.textAlign = "right";
-    ctx.fillText("🥚", w - border * 1.2, border * 1.2);
+    ctx.fillText(settings.pb_top_right_emoji, w - border * 1.2, border * 1.2);
     ctx.textAlign = "left";
 
     // Bottom name plate
@@ -101,17 +103,17 @@ const PhotoboothFloatingButton = () => {
     ctx.restore();
 
     // Name text
-    ctx.fillStyle = "#3A6E4B";
+    ctx.fillStyle = settings.pb_name_color;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const nameSize = Math.round(plateH * 0.36);
     ctx.font = `bold ${nameSize}px "Fredoka One", "Nunito", sans-serif`;
-    ctx.fillText("CAEL AVERY M. ALFONSO", w / 2, plateY + plateH * 0.38);
+    ctx.fillText(settings.pb_title, w / 2, plateY + plateH * 0.38);
 
     const subSize = Math.round(plateH * 0.22);
     ctx.font = `600 ${subSize}px "Nunito", sans-serif`;
-    ctx.fillStyle = "#7a5a2e";
-    ctx.fillText("🦕 Our Little Dino • Christening 🦕", w / 2, plateY + plateH * 0.74);
+    ctx.fillStyle = settings.pb_subtitle_color;
+    ctx.fillText(settings.pb_subtitle, w / 2, plateY + plateH * 0.74);
   };
 
   const capture = () => {
@@ -187,7 +189,7 @@ const PhotoboothFloatingButton = () => {
 
           {/* Label */}
           <span className="absolute -top-2 -right-2 rounded-full bg-card border border-border px-2 py-0.5 text-[10px] font-heading text-foreground shadow-sm whitespace-nowrap">
-            Photobooth
+            {settings.pb_button_label}
           </span>
         </span>
       </button>
@@ -216,12 +218,19 @@ const PhotoboothFloatingButton = () => {
                 />
                 {/* Live frame overlay preview */}
                 <div className="pointer-events-none absolute inset-0">
-                  <div className="absolute inset-2 rounded-xl border-4 border-transparent" style={{ borderImage: "linear-gradient(135deg, #A8DADC, #F6E27F, #F4A261) 1" }} />
-                  <span className="absolute top-3 left-3 text-2xl">🦕</span>
-                  <span className="absolute top-3 right-3 text-2xl">🥚</span>
+                  <div
+                    className="absolute inset-2 rounded-xl border-4 border-transparent"
+                    style={{ borderImage: `linear-gradient(135deg, ${settings.pb_border_color_1}, ${settings.pb_border_color_2}, ${settings.pb_border_color_3}) 1` }}
+                  />
+                  <span className="absolute top-3 left-3 text-2xl">{settings.pb_top_left_emoji}</span>
+                  <span className="absolute top-3 right-3 text-2xl">{settings.pb_top_right_emoji}</span>
                   <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-card/85 backdrop-blur-sm px-3 py-2 text-center">
-                    <p className="font-heading text-sm text-primary leading-tight">CAEL AVERY M. ALFONSO</p>
-                    <p className="font-body text-[10px] text-muted-foreground">🦕 Our Little Dino • Christening 🦕</p>
+                    <p className="font-heading text-sm leading-tight" style={{ color: settings.pb_name_color }}>
+                      {settings.pb_title}
+                    </p>
+                    <p className="font-body text-[10px]" style={{ color: settings.pb_subtitle_color }}>
+                      {settings.pb_subtitle}
+                    </p>
                   </div>
                 </div>
               </>
