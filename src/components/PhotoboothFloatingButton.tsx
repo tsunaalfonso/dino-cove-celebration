@@ -3,8 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Camera, Download, RefreshCw, SwitchCamera } from "lucide-react";
 import { toast } from "sonner";
+import { usePhotoboothSettings } from "@/hooks/usePhotoboothSettings";
 
 const PhotoboothFloatingButton = () => {
+  const { settings } = usePhotoboothSettings();
   const [open, setOpen] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
