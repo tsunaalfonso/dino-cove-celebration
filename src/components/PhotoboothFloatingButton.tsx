@@ -61,9 +61,9 @@ const PhotoboothFloatingButton = () => {
     ctx.save();
     ctx.lineWidth = border;
     const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, "#A8DADC");
-    grad.addColorStop(0.5, "#F6E27F");
-    grad.addColorStop(1, "#F4A261");
+    grad.addColorStop(0, settings.pb_border_color_1);
+    grad.addColorStop(0.5, settings.pb_border_color_2);
+    grad.addColorStop(1, settings.pb_border_color_3);
     ctx.strokeStyle = grad;
     ctx.strokeRect(border / 2, border / 2, w - border, h - border);
     ctx.restore();
@@ -72,9 +72,9 @@ const PhotoboothFloatingButton = () => {
     const emojiSize = Math.round(Math.min(w, h) * 0.07);
     ctx.font = `${emojiSize}px serif`;
     ctx.textBaseline = "top";
-    ctx.fillText("🦕", border * 1.2, border * 1.2);
+    ctx.fillText(settings.pb_top_left_emoji, border * 1.2, border * 1.2);
     ctx.textAlign = "right";
-    ctx.fillText("🥚", w - border * 1.2, border * 1.2);
+    ctx.fillText(settings.pb_top_right_emoji, w - border * 1.2, border * 1.2);
     ctx.textAlign = "left";
 
     // Bottom name plate
@@ -103,17 +103,17 @@ const PhotoboothFloatingButton = () => {
     ctx.restore();
 
     // Name text
-    ctx.fillStyle = "#3A6E4B";
+    ctx.fillStyle = settings.pb_name_color;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const nameSize = Math.round(plateH * 0.36);
     ctx.font = `bold ${nameSize}px "Fredoka One", "Nunito", sans-serif`;
-    ctx.fillText("CAEL AVERY M. ALFONSO", w / 2, plateY + plateH * 0.38);
+    ctx.fillText(settings.pb_title, w / 2, plateY + plateH * 0.38);
 
     const subSize = Math.round(plateH * 0.22);
     ctx.font = `600 ${subSize}px "Nunito", sans-serif`;
-    ctx.fillStyle = "#7a5a2e";
-    ctx.fillText("🦕 Our Little Dino • Christening 🦕", w / 2, plateY + plateH * 0.74);
+    ctx.fillStyle = settings.pb_subtitle_color;
+    ctx.fillText(settings.pb_subtitle, w / 2, plateY + plateH * 0.74);
   };
 
   const capture = () => {
