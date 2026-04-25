@@ -1,0 +1,1 @@
+INSERT INTO public.event_settings (key, value) VALUES ('og_version', '3') ON CONFLICT (key) DO NOTHING;
