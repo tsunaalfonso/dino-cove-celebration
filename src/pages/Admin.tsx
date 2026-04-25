@@ -7,6 +7,7 @@ import BabyPhotoUpload from "@/components/BabyPhotoUpload";
 import AdminWishlistManager from "@/components/AdminWishlistManager";
 import AdminGodparentsManager from "@/components/AdminGodparentsManager";
 import AdminPhotoboothManager from "@/components/AdminPhotoboothManager";
+import AdminOgRefresh from "@/components/AdminOgRefresh";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 import {
@@ -170,6 +171,11 @@ const Admin = () => {
         {/* Photobooth Manager */}
         <div className="mb-8">
           <AdminPhotoboothManager />
+        </div>
+
+        {/* OG Share Preview Refresh */}
+        <div className="mb-8">
+          <AdminOgRefresh />
         </div>
 
         {/* Table */}
